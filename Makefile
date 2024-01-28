@@ -5,5 +5,5 @@ test:
 	docker exec -it app python manage.py test
 
 migrations:
-	docker exec -it app python manage.py makemigrations
+	docker exec -it app python manage.py makemigrations take_home
 	docker exec -it app python manage.py migrate
