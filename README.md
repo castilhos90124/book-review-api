@@ -1,45 +1,130 @@
-# Take Home - Django Skeleton
+# Take Home - Book Review Application
 
 ## Getting Started
 Dependencies:
 * Docker - See [Get Docker](https://docs.docker.com/get-docker/)
 * Docker Compose - Installed with Docker Desktop, See [Install Docker Compose](https://docs.docker.com/compose/install/)
+* Make - See [Install Make](https://linuxhint.com/install-make-ubuntu/)
 
-With the dependencies installed, running the project is as simple as running:
-```bash
-docker compose up
+To start the application, open a terminal on the root folder and run:
+
 ```
-
-This will pull the required Docker images and spin up a container running your service on http://localhost:8000.
+make run
+```
+It can be accessed in http://localhost:8010/
 
 To end the service, press `Ctrl+C`
 
-## The Activity
-Build a simple API in Python, using Django or Flask. This API should integrate with a third party service or a database and accomplish something interesting, but also shouldn’t take terribly long to implement - endpoints for one or two resources would be sufficient. This activity shouldn’t take more than an hour or so. If this doesn’t seem like much time - you’re right! We expect that you’ll have to focus on one of a few areas for your API:
-* The API design and interface (REST vs. GraphQL)
-* Integration with a third-party API OR Integration with a database
+## Testing
 
-### Requirements
-1. A clear problem statement - what do you intend the API to accomplish?
-2. Dependencies for running the API
-3. A code repository link from which your interview can checkout the code OR a .zip file containing the source code
-4. A README file in the code root containing instructions for running the API
+To run integration and unit tests, run:
+```
+make test
+```
 
-### Some Ideas...
-#### Interesting APIs
-* [NASA Open APIs](https://api.nasa.gov/index.html)
-* [OpenWeather API](https://openweathermap.org/api)
-* [Polygon.io Stocks API](https://polygon.io/)
+## Problem Statement
+Many people like to read books, but it is difficult to know if a book is good or not before reading it. 
+So I decided to create a book rating API, which will allow us to search for books, rate and review the books we have read.
 
-Plus anything more you can discover
-#### Databases
-* [SQLite](https://www.sqlite.org/index.html)
-* [PostgreSQL](https://www.postgresql.org/)
-* [MySQL](https://www.mysql.com/)
-* [MariaDB](https://mariadb.org/)
+In order to do that, the API will get books data from a third party called [Gutendex API](https://gutendex.com/)
 
-PostgreSQL is provided in our skeleton projects, but another database is fine if you’d prefer.
-#### Projects
-* A stock recommendation service
-* A green/red alert for outdoor activity safety
-* A Mars Rover camera viewer
+## Features
+
+### Search for books
+It is possible to search for books, providing the title of the book and getting the information from Gutendex API.
+
+Example of request:
+```
+curl --location 'http://127.0.0.1:8010/books?book_title=Frankenstein'
+```
+
+Example of response:
+```
+{
+    "books": [
+        {
+            "id": 84,
+            "title": "Frankenstein; Or, The Modern Prometheus",
+            "authors": [
+                {
+                    "name": "Shelley, Mary Wollstonecraft",
+                    "birth_year": 1797,
+                    "death_year": 1851
+                }
+            ],
+            "languages": [
+                "en"
+            ],
+            "download_count": 60961
+        },
+        {
+            "id": 62405,
+            "title": "Frankenstein, ou le Prométhée moderne Volume 2 (of 3)",
+            "authors": [
+                {
+                    "name": "Shelley, Mary Wollstonecraft",
+                    "birth_year": 1797,
+                    "death_year": 1851
+                }
+            ],
+            "languages": [
+                "fr"
+            ],
+            "download_count": 74
+        }
+    ]
+}
+```
+### Review a book
+To add a book review, we need to provide the book id (same as the Gutendex API), the rating (integer from 1 to 5) and the review comment.
+
+
+Example of request:
+```
+curl --location 'http://127.0.0.1:8010/books/' \
+--header 'Content-Type: application/json' \
+--data '{
+    "book_id": 84,
+    "rating": 5,
+    "review": "An amazing book!"
+}'
+```
+
+### Get details of a specific book
+It is possible to get more details of a specific book, then we can see the average rating and the reviews of the desired book. 
+
+To provide this reponse, our API will get data from Gutendex API, and also from our own database.
+
+Example of request:
+```
+curl --location 'http://127.0.0.1:8010/books/84'
+```
+Example of response:
+```
+{
+    "id": 84,
+    "title": "Frankenstein; Or, The Modern Prometheus",
+    "authors": [
+        {
+            "name": "Shelley, Mary Wollstonecraft",
+            "birth_year": 1797,
+            "death_year": 1851
+        }
+    ],
+    "languages": [
+        "en"
+    ],
+    "download_count": 60961,
+    "rating": 3.5,
+    "reviews": [
+        "Awesome book",
+        "Not good"
+    ]
+}
+```
+
+## Documentation
+You can access the swagger documentation [here](http://127.0.0.1:8010/docs):
+```
+http://127.0.0.1:8010/docs
+```
